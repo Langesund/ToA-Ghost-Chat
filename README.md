@@ -1,2 +1,1 @@
-# Example
-An example greeter plugin
+Replaces messages from ghost players in Tombs of Amascut with ghostly phrases.
