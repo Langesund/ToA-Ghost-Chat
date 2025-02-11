@@ -24,13 +24,11 @@ public class ToAGhostChatPlugin extends Plugin {
 
 	private final Set<String> ghostPlayers = new HashSet<>();
 
-	// List of Tombs of Amascut region IDs
 	private static final Set<Integer> TOA_REGION_IDS = Set.of(
 			14160, 15186, 15698, 14162, 14674, 15188, 14164,
 			14676, 15700, 15184, 15696, 14672
 	);
 
-	// List of ghostly messages
 	private final String[] ghostMessages = {
 			"woowoowoo",
 			"Wooo000oooooo!",
@@ -51,19 +49,16 @@ public class ToAGhostChatPlugin extends Plugin {
 				String playerName = player.getName();
 				int healthRatio = player.getHealthRatio();
 
-				// If player health is 0 and not already marked as a ghost, add them to ghost state
 				if (healthRatio == 0 && !ghostPlayers.contains(playerName)) {
 					ghostPlayers.add(playerName);
 				}
 
-				// If player is in ghostPlayers but their health is restored, remove them from ghost state
 				if (healthRatio > 0 && ghostPlayers.contains(playerName)) {
 					ghostPlayers.remove(playerName);
-					player.setOverheadText(null); // Clear overhead text
+					player.setOverheadText(null);
 				}
 			}
 		} else {
-			// Reset all ghost states when leaving ToA
 			clearGhostPlayers();
 		}
 	}
@@ -71,12 +66,11 @@ public class ToAGhostChatPlugin extends Plugin {
 	@Subscribe
 	public void onChatMessage(ChatMessage event) {
 		if (!isInToA()) {
-			return; // Do nothing if not in ToA
+			return;
 		}
 
 		String message = event.getMessage();
 
-		// Detect room completion, boss death, or room failure messages
 		if (message.startsWith("Challenge complete:") ||
 				message.startsWith("Your party failed to complete the challenge")) {
 			clearGhostPlayers();
@@ -85,16 +79,14 @@ public class ToAGhostChatPlugin extends Plugin {
 		// Handle ghost chat modification
 		Player player = findPlayerByName(event.getName());
 		if (player != null && ghostPlayers.contains(player.getName())) {
-			// Generate a new random ghostly message, with a 0.1% chance of "uwu"
 			String ghostMessage = getRandomGhostMessage();
-			event.getMessageNode().setValue(ghostMessage); // Update chat message
-			player.setOverheadText(ghostMessage); // Update overhead message
+			event.getMessageNode().setValue(ghostMessage);
+			player.setOverheadText(ghostMessage);
 			client.refreshChat();
 		}
 	}
 
 	private boolean isInToA() {
-		// Check if the player's current region matches one of the ToA region IDs
 		int[] currentRegions = client.getMapRegions();
 		if (currentRegions == null) {
 			return false;
@@ -109,12 +101,10 @@ public class ToAGhostChatPlugin extends Plugin {
 	}
 
 	private String getRandomGhostMessage() {
-		// 0.1% chance to return "uwu"
 		if (ThreadLocalRandom.current().nextDouble() < 0.001) {
 			return "uwu";
 		}
 
-		// Otherwise, select a random message from the ghostMessages array
 		int randomIndex = ThreadLocalRandom.current().nextInt(ghostMessages.length);
 		return ghostMessages[randomIndex];
 	}
